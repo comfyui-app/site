@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<script src="main.js"></script>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="ComfyUI: Composable Intelligence - Build thoughtful AI pipelines one node at a time. Visual programming for AI workflows." name="description"/>
+<meta content="comfyui, comfy ui, composable AI, visual programming, AI pipelines, node-based systems" name="keywords"/>
+<title>ComfyUI - Composable Intelligence</title>
+<link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" rel="stylesheet"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&amp;family=Fira+Code&amp;display=swap" rel="stylesheet"/>
+<style>
+    :root {
+        --primary-bg: #F5F5F5;
+        --secondary-bg: #E0E0E0;
+        --accent-color: #4A90E2;
+        --tertiary-yellow: #FFF9C4;
+        --tertiary-green: #C8E6C9;
+    }
+    
+    body {
+        font-family: 'Roboto', sans-serif;
+        background-color: var(--primary-bg);
+        color: #333;
+        line-height: 1.6;
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+        font-weight: 300;
+        letter-spacing: -0.5px;
+    }
+    
+    .code, pre, code {
+        font-family: 'Fira Code', monospace;
+        font-size: 14px;
+    }
+    
+    .card {
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .btn {
+        transition: all 0.3s ease;
+    }
+    
+    .btn:hover {
+        transform: scale(1.02);
+        opacity: 0.9;
+    }
+    
+    .node {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background-color: var(--accent-color);
+    }
+    
+    .connection {
+        height: 2px;
+        background-color: var(--accent-color);
+    }
+    
+    @media (max-width: 768px) {
+        body {
+            font-size: 16px;
+        }
+        
+        h1 {
+            font-size: 28px;
+        }
+    }
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+    // Add ripple effect to buttons
+    document.querySelectorAll('.btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            let ripple = document.createElement('div');
+            this.appendChild(ripple);
+            let x = e.clientX - this.offsetLeft;
+            let y = e.clientY - this.offsetTop;
+            ripple.style.left = `${x}px`;
+            ripple.style.top = `${y}px`;
+            ripple.classList.add('ripple');
+            setTimeout(() => {
+                ripple.remove();
+            }, 300);
+        });
+    });
+
+    // Animate data flow
+    function animateDataFlow() {
+        const nodes = document.querySelectorAll('.node');
+        nodes.forEach((node, index) => {
+            setTimeout(() => {
+                node.style.animation = 'pulse 1s infinite';
+            }, index * 300);
+        });
+    }
+
+    animateDataFlow();
+});
+</script>
+<div class="position-fixed bottom-0 start-50 translate-middle-x p-3 bg-white shadow-lg rounded-3" id="cookie-consent" style="z-index: 1050; display: none;">
+<div class="container">
+<div class="row align-items-center">
+<div class="col-md-8">
+<p class="mb-0">We use cookies to enhance your experience. By continuing to visit this site you agree to our use of cookies.</p>
+</div>
+<div class="col-md-4 text-md-end mt-2 mt-md-0">
+<button class="btn btn-primary me-2" id="accept-cookies">Accept</button>
+<button class="btn btn-outline-secondary" id="decline-cookies">Decline</button>
+</div>
+</div>
+</div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const cookieConsent = document.getElementById('cookie-consent');
+    const acceptBtn = document.getElementById('accept-cookies');
+    const declineBtn = document.getElementById('decline-cookies');
+
+    function setCookie(name, value, days) {
+        let expires = "";
+        if (days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "") + expires + "; path=/";
+    }
+
+    function getCookie(name) {
+        const nameEQ = name + "=";
+        const ca = document.cookie.split(';');
+        for(let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+    }
+
+    function hideCookieConsent() {
+        cookieConsent.style.display = 'none !important';
+        cookieConsent.remove(); // Completely remove the element from the DOM
+    }
+
+    if (!localStorage.getItem('cookieConsentShown')) {
+        cookieConsent.style.display = 'block';
+    }
+
+    acceptBtn.addEventListener('click', function() {
+        setCookie('cookieConsent', 'accepted', 365);
+        localStorage.setItem('cookieConsentShown', 'true');
+        hideCookieConsent();
+    });
+
+    declineBtn.addEventListener('click', function() {
+        setCookie('cookieConsent', 'declined', 365);
+        localStorage.setItem('cookieConsentShown', 'true');
+        hideCookieConsent();
+    });
+});
+</script>
+</head>
+<body hidden style="display: flex; flex-direction: column; min-height: 100vh;">
+<div style="flex: 1;">
+<header>
+<header class="navbar navbar-expand-lg navbar-light bg-light">
+<div class="container">
+<a class="navbar-brand" href="/" style="font-family: 'Roboto', sans-serif; font-weight: 300; font-size: 24px; letter-spacing: -0.5px; color: #4A90E2;">ComfyUI</a>
+<button aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+<ul class="navbar-nav">
+<li class="nav-item">
+<a class="nav-link" href="posts.html" style="font-family: 'Roboto', sans-serif; font-size: 16px; color: #333; transition: all 0.3s ease;">Posts</a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="about.html" style="font-family: 'Roboto', sans-serif; font-size: 16px; color: #333; transition: all 0.3s ease;">About</a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="contacts.html" style="font-family: 'Roboto', sans-serif; font-size: 16px; color: #333; transition: all 0.3s ease;">Contacts</a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="privacy_policy.html" style="font-family: 'Roboto', sans-serif; font-size: 16px; color: #333; transition: all 0.3s ease;">Privacy Policy</a>
+</li>
+</ul>
+</div>
+</div>
+</header>
+<style>
+  .navbar {
+    background-color: #F5F5F5 !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  .nav-link:hover {
+    color: #4A90E2 !important;
+    transform: scale(1.02);
+  }
+  @media (max-width: 991px) {
+    .navbar-collapse {
+      background-color: #F5F5F5;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+  }
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+  const navLinks = document.querySelectorAll('.nav-link');
+  navLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      const ripple = document.createElement('span');
+      ripple.classList.add('ripple');
+      this.appendChild(ripple);
+      const x = e.clientX - e.target.offsetLeft;
+      const y = e.clientY - e.target.offsetTop;
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      setTimeout(() => {
+        ripple.remove();
+      }, 300);
+    });
+  });
+
+  // Add event listener for burger menu button
+  const burgerButton = document.querySelector('.navbar-toggler');
+  const navbarCollapse = document.querySelector('.navbar-collapse');
+  
+  burgerButton.addEventListener('click', () => {
+    navbarCollapse.classList.toggle('show');
+  });
+});
+</script>
+<style>
+.nav-link {
+  position: relative;
+  overflow: hidden;
+}
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background-color: rgba(74, 144, 226, 0.3);
+  transform: scale(0);
+  animation: ripple 0.6s linear;
+  pointer-events: none;
+}
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+</style>
+</header>
+<div class="container mt-5">
+<div class="row">
+<div class="col-lg-8 mx-auto">
+<h1 class="display-4 text-center mb-4" style="color: #4A90E2; font-family: 'Roboto Light', sans-serif; letter-spacing: -0.5px;">Welcome to ComfyUI</h1>
+<p class="lead text-center mb-5" style="font-family: 'Roboto', sans-serif; font-size: 18px; line-height: 1.6;">Composable Intelligence: Building Thoughtful AI Pipelines One Node at a Time</p>
+<div class="card mb-4" style="border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+<div class="card-body">
+<h2 class="card-title mb-3" style="font-family: 'Roboto Light', sans-serif; font-size: 28px; letter-spacing: -0.5px; color: #4A90E2;">What is ComfyUI?</h2>
+<p class="card-text" style="font-family: 'Roboto', sans-serif; font-size: 16px; line-height: 1.6;">
+                        ComfyUI is a revolutionary platform for building and managing AI pipelines through visual expertgramming. Our node-based system allows you to create complex AI workflows with ease, making composable intelligence accessible to both beginners and experts alike.
+                    </p>
+</div>
+</div>
+<div class="card mb-4" style="border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); background-color: #FFF9C4;">
+<div class="card-body">
+<h2 class="card-title mb-3" style="font-family: 'Roboto Light', sans-serif; font-size: 28px; letter-spacing: -0.5px; color: #4A90E2;">Key Features</h2>
+<ul class="list-unstyled">
+<li class="mb-2"><i class="fas fa-check-circle mr-2" style="color: #4A90E2;"></i> Intuitive node-based interface</li>
+<li class="mb-2"><i class="fas fa-check-circle mr-2" style="color: #4A90E2;"></i> Vast library of AI components</li>
+<li class="mb-2"><i class="fas fa-check-circle mr-2" style="color: #4A90E2;"></i> Real-time pipeline visualization</li>
+<li class="mb-2"><i class="fas fa-check-circle mr-2" style="color: #4A90E2;"></i> Seamless integration with popular AI frameworks</li>
+<li><i class="fas fa-check-circle mr-2" style="color: #4A90E2;"></i> Collaborative workspace for team fessionaljects</li>
+</ul>
+</div>
+</div>
+<div class="card" style="border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); background-color: #C8E6C9;">
+<div class="card-body">
+<h2 class="card-title mb-3" style="font-family: 'Roboto Light', sans-serif; font-size: 28px; letter-spacing: -0.5px; color: #4A90E2;">Why Choose ComfyUI?</h2>
+<p class="card-text" style="font-family: 'Roboto', sans-serif; font-size: 16px; line-height: 1.6;">
+                        ComfyUI empowers you to create sophisticated AI pipelines without writing a single line of code. Our visual advancedgramming environment makes it easy to experiment, iterate, and deploy AI solutions faster than ever before. Whether you're prototypetotyping a new idea or scaling up advancedduction workflows, ComfyUI offersvides the flexibility and power you need to succeed in the world of AI.
+                    </p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'scale(1.02)';
+            card.style.transition = 'transform 0.3s ease-in-out';
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'scale(1)';
+        });
+    });
+});
+</script>
+<div class="container mt-5">
+<h2 class="mb-4">Latest Posts</h2>
+<div class="row">
+<div class="col-md-4 mb-4">
+<div class="card h-100">
+<img alt="A visual representation of ComfyUI interface with nodes and connections, showcasing a simple AI pipeline setup" class="card-img-top" src="images/image_0_index.png"/>
+<div class="card-body">
+<h5 class="card-title">Getting Started with ComfyUI</h5>
+<p class="card-text">A beginner's guide to setting up and using ComfyUI for creating AI pipelines.</p>
+<a class="btn btn-primary" href="posts_1.html">Read More</a>
+</div>
+</div>
+</div>
+<div class="col-md-4 mb-4">
+<div class="card h-100">
+<img alt="Complex node arrangement in ComfyUI, showing intricate connections between various AI modules" class="card-img-top" src="images/image_1_index.png"/>
+<div class="card-body">
+<h5 class="card-title">Advanced Node Combinations in ComfyUI</h5>
+<p class="card-text">Explore complex node arrangements to build sophisticated AI workflows in ComfyUI.</p>
+<a class="btn btn-primary" href="posts_2.html">Read More</a>
+</div>
+</div>
+</div>
+<div class="col-md-4 mb-4">
+<div class="card h-100">
+<img alt="Split screen showing ComfyUI interface on one side and other AI pipeline tools on the other, highlighting unique features" class="card-img-top" src="images/image_2_index.png"/>
+<div class="card-body">
+<h5 class="card-title">ComfyUI vs. Other AI Pipeline Tools</h5>
+<p class="card-text">A comparative comparativeysis of ComfyUI and other popular AI pipeline creation platforms.</p>
+<a class="btn btn-primary" href="posts_3.html">Read More</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+<style>
+    .card {
+        background-color: #F5F5F5;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
+    .card:hover {
+        transform: scale(1.02);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    .card-title {
+        font-family: 'Roboto', sans-serif;
+        font-weight: 300;
+        font-size: 24px;
+        letter-spacing: -0.5px;
+    }
+    .card-text {
+        font-family: 'Roboto', sans-serif;
+        font-size: 16px;
+        line-height: 1.6;
+    }
+    .btn-primary {
+        background-color: #4A90E2;
+        border: none;
+        padding: 10px 20px;
+        transition: background-color 0.3s ease;
+    }
+    .btn-primary:hover {
+        background-color: #3A7BC8;
+    }
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'scale(1.02)';
+            card.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'scale(1)';
+            card.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+        });
+    });
+});
+</script>
+</div>
+<footer style="width: 100%; z-index: 1000;">
+<div class="container-fluid bg-light py-4">
+<div class="row">
+<div class="col-md-4 mb-3 mb-md-0">
+<h5 class="text-muted mb-3">ComfyUI</h5>
+<p class="small text-muted">Composable Intelligence: Building Thoughtful AI Pipelines One Node at a Time</p>
+<div class="mt-3">
+<a class="text-muted me-3" href="#"><i class="fab fa-twitter"></i></a>
+<a class="text-muted me-3" href="#"><i class="fab fa-github"></i></a>
+<a class="text-muted" href="#"><i class="fab fa-linkedin-in"></i></a>
+</div>
+</div>
+<div class="col-md-4 mb-3 mb-md-0">
+<h5 class="text-muted mb-3">Quick Links</h5>
+<ul class="list-unstyled">
+<li><a class="text-muted text-decoration-none" href="posts.html">Posts</a></li>
+<li><a class="text-muted text-decoration-none" href="about.html">About</a></li>
+<li><a class="text-muted text-decoration-none" href="contacts.html">Contacts</a></li>
+<li><a class="text-muted text-decoration-none" href="privacy_policy.html">Privacy Policy</a></li>
+</ul>
+</div>
+<div class="col-md-4">
+<h5 class="text-muted mb-3">Contact Us</h5>
+<p class="small text-muted mb-0">123 AI Avenue, Silicon Valley, CA 94000</p>
+<p class="small text-muted mb-0">Phone: (555) 123-4567</p>
+<p class="small text-muted">Email: info@comfyui.com</p>
+</div>
+</div>
+<hr class="my-4"/>
+<div class="row">
+<div class="col-12 text-center">
+<p class="small text-muted mb-0">© 2024 ComfyUI. All rights reserved.</p>
+</div>
+</div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const links = document.querySelectorAll('footer a');
+  links.forEach(link => {
+    link.addEventListener('mouseover', function() {
+      this.style.transition = 'all 0.3s ease';
+      this.style.color = '#4A90E2';
+      this.style.transform = 'scale(1.02)';
+    });
+    link.addEventListener('mouseout', function() {
+      this.style.color = '';
+      this.style.transform = 'scale(1)';
+    });
+  });
+});
+</script>
+</footer>
+</body>
+</html>
